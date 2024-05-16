@@ -1,0 +1,594 @@
+create table Patient(
+Patient_ID number(10),
+First_Name varchar2(20) not null,
+Last_Name  varchar2(20) not null,
+Zip_Number number(7) not null,
+Street     varchar2(20) null,
+city       varchar2(20) null,
+Gender     varchar2(6) not null,
+Birthdate  date not null,
+Disease    varchar2(20) not null,
+constraint pk_patient primary key(Patient_ID)
+)
+------------------------------------------------------------------------------
+create table Employee(
+Employee_ID number(10),
+First_Name  varchar2(20) not null,
+Last_Name   varchar2(20) not null,
+phone       number(20) not null,
+Zip_Number  number(7) not null,
+city        varchar2(20),
+Street      varchar2(20),
+Gender      varchar2(6) not null,
+salary      number(5) not null,
+constraint pk_employee primary key(Employee_ID)
+)
+------------------------------------------------------------------------------
+create table Department(
+Department_Name varchar2(15),
+constraint pk_Department primary key(Department_Name)
+)
+------------------------------------------------------------------------------
+create table Room(
+Room_Number number(5),
+Room_Type   varchar2(15) not null,
+status      varchar2(10) not null,
+constraint pk_room primary key(Room_Number)
+)
+------------------------------------------------------------------------------
+create table Medicine(
+Medicine_ID   number(10),
+Medicine_Name varchar2(50) not null,
+constraint pk_medicine primary key(Medicine_ID)
+)
+------------------------------------------------------------------------------
+create table Laboratory(
+Lab_Num number(5),
+constraint pk_laboratory primary key(Lab_Num)
+)
+------------------------------------------------------------------------------
+create table Payment(
+Payment_ID number(10),
+status     varchar2(10),
+Type       varchar2(10),
+constraint pk_payment primary key(Payment_ID)
+)
+------------------------------------------------------------------------------
+create table Phone_Number(
+Phone_Number number(20),
+Patient_ID   number(10),
+constraint pk_phone primary key(Phone_Number,Patient_ID),
+constraint fk_patient_phone foreign key(Patient_ID) references patient(Patient_ID)
+) 
+------------------------------------------------------------------------------
+create table Equipment(
+Equipment_ID    number(10),
+Name            varchar2(10) not null,
+Pro_Country     varchar2(10) not null,
+Pro_Company     varchar2(10) not null,
+Equipment_Price number(6) not null,
+Lab_Num         number(5) not null,
+constraint pk_equipment primary key(Equipment_ID),
+constraint fk_laboratory_equipment foreign key(Lab_Num) references Laboratory(Lab_Num)
+)
+------------------------------------------------------------------------------
+create table Nurse(
+Nurse_ID number(10),
+constraint pk_nurse primary key(Nurse_ID),
+constraint fk_employee_nurse foreign key(Nurse_ID) references Employee(Employee_ID)
+)
+------------------------------------------------------------------------------
+create table Receptionist(
+Receptionist_ID number(10),
+constraint pk_receptionist primary key(Receptionist_ID),
+constraint fk_employee_receptionist foreign key(Receptionist_ID) references Employee(Employee_ID)
+)
+------------------------------------------------------------------------------
+create table Doctor(
+Doctor_ID number(10),
+Lab_Num   number(5) null,
+Department_Name varchar(15) not null,
+constraint pk_doctor primary key(Doctor_ID),
+constraint fk_Employee_doctor foreign key(Doctor_ID) references Employee(Employee_ID),
+constraint fk_laboratory_doctor foreign key(Lab_Num) references Laboratory(Lab_Num),
+constraint fk_department_doctor foreign key(Department_Name) references Department(Department_Name)
+)
+------------------------------------------------------------------------------
+create table Outpatient(
+Outpatient_ID   number(10),
+admission_date  date not null,
+constraint pk_outpatient primary key(Outpatient_ID),
+constraint fk_patient_outpatient foreign key(Outpatient_ID) references Patient(Patient_ID)
+)
+------------------------------------------------------------------------------
+create table Inpatient(
+Inpatient_ID number(10),
+Room_Number  number(5) not null UNIQUE,
+Date_Discharged date not null,
+Date_Admitted   date not null,
+constraint pk_inpatient primary key(Inpatient_ID),
+constraint fk_patient_inpatient foreign key(Inpatient_ID) references Patient(Patient_ID),
+constraint fk_room_inpatient foreign key (Room_Number) references Room(Room_Number)
+)
+------------------------------------------------------------------------------
+create table Bill(
+Bill_ID number(10),
+patient_ID number(10) not null UNIQUE,
+payment_ID number(10) not null UNIQUE,
+Receptionist_ID number(10) not null,
+Doc_Charges number(7),
+Room_Charges number(7),
+constraint pk_bill primary key(Bill_ID),
+constraint fk_patient_bill foreign key(patient_ID) references patient(patient_ID),
+constraint fk_payment_bill foreign key(payment_ID) references payment(Payment_ID),
+constraint fk_receptionist_bill foreign key(Receptionist_ID) references Receptionist(Receptionist_ID)
+)
+------------------------------------------------------------------------------
+create table Analysis(
+analyse_num number(10),
+Lab_Num      number(5) not null,
+patient_ID   number(10),
+Analyse_date date      not null,
+constraint pk_analysis primary key(analyse_num),
+constraint fk_laboratory_anaylsis foreign key(Lab_Num) references Laboratory(Lab_Num),
+constraint fk_patient_anaylsis foreign key(patient_ID) references patient(patient_ID)
+)
+------------------------------------------------------------------------------
+create table Description(
+prescription_ID number(10),
+Medicine_ID     number(10) not null,
+Doctor_ID       number(10) not null,
+Patient_ID      number(10) not null,
+Quantity        number(10) not null,
+constraint pk_description primary key(prescription_ID),
+constraint fk_medicine_description foreign key(Medicine_ID) references Medicine(Medicine_ID),
+constraint fk_doctor_description foreign key(Doctor_ID) references Doctor(Doctor_ID),
+constraint fk_patient_description foreign key(Patient_ID) references Patient(Patient_ID)
+)
+------------------------------------------------------------------------------
+create table Examination(
+Patient_ID number(10),
+Doctor_ID  number(10),
+Examin_Date date not null,
+constraint pk_examination primary key(Patient_ID,Doctor_ID) ,
+constraint fk_doctor_examination foreign key(Doctor_ID) references Doctor(Doctor_ID),
+constraint fk_patient_examination foreign key(Patient_ID) references Patient(Patient_ID)
+)
+-------------------------------------------------------------------------------
+create table Helping(
+Doctor_ID number(10),
+nurse_ID  number(10),
+constraint pk_helper primary key(Doctor_ID,nurse_ID),
+constraint fk_doctor_helping foreign key(Doctor_ID) references doctor(Doctor_ID),
+constraint fk_nurse_helping foreign key(nurse_ID) references nurse(nurse_ID)
+)
+-------------------------------------------------------------------------------
+create table Governs(
+Nurse_ID    number(10),
+Room_Number number(5),
+constraint pk_Governs primary key(Room_Number ,nurse_ID),
+constraint fk_nurse_Governs foreign key(nurse_ID) references nurse(nurse_ID),
+constraint fk_room_helping foreign key(Room_Number) references room(Room_Number)
+)
+-------------------------------------------------------------------------------
+                               | Data Insertion |
+-------------------------------------------------------------------------------
+OutPatients |
+-------------
+insert into patient values (111111, 'Ahmed', 'Ibrahim', 21619, '4 Omar lotfy', 'Alexandria', 'Male', to_date('03-12-1997'), 'acne')
+insert into patient values (111114, 'Nada', 'Mohamed', 21515, '117 Foad street', 'Alexandria', 'Female', to_date('04-26-2002'), 'Fever')
+insert into patient values (111116, 'Ziad', 'Ali', 21648, '22 Mohamed Moaz', 'Alexandria', 'Male', to_date('01-03-2004'), 'Fever') ​
+insert into patient values (111117, 'Esraa', 'Ossama', 21611, '8 Al-Moshir', 'Alexandria', 'Female', to_date('11-27-2001'), 'Psych disorders')
+insert into patient values (111118, 'Rahma','Ibrahim', 21648, '29 Mahmodya Street', 'Alexandria', 'Female', to_date('11-3-1994'), 'acne')
+insert into patient values (111119, 'Ahmed', 'Samy', 21611, '37 Khalil Hamada', 'Alexandria', 'Male', to_date('04-26-2002'), 'Fever')
+insert into patient values (111120, 'Tasneem', 'Yousry', 21611, '18 Cairo Street', 'Alexandria', 'Female', to_date('09-13-2002'), 'H-B pressure')
+insert into patient values (111121, 'Amr', 'Mahmoud', 21611, '37 Seif Street', 'Alexandria', 'Male', to_date('01-01-2002'), 'Irr-Heartbeat')
+insert into patient values (111124, 'Mariam', 'Ahmed', 21611, '19 Ahmed Gamal', 'Alexandria', 'Female', to_date('09-15-2002'), 'Pancreas')
+insert into patient values (111125, 'Omar', 'Alaa', 21619, '56 AL-Nasr Street', 'Alexandria', 'Male', to_date('02-02-2013'), 'anemia')
+------------
+InPatients |
+------------
+insert into patient values (111122, 'Nour', 'Yasser', 21648, '3 Fawzy Moaz', 'Alexandria', 'Female', to_date('01-15-2003'), 'Stigmatism')
+insert into patient values (111123, 'Ahmed', 'Yasser', 21532, '6 Omar Taha', 'Alexandria', 'Male', to_date('06-02-1992'), 'Inflam of cartil')
+insert into patient values (111115, 'Salma', 'Mousa', 21532, '36 Ahmed Moheb', 'Alexandria', 'Female', to_date('03-19-1993'), 'Pneumonia')
+insert into patient values (111113, 'Karim', 'Hussam Al-Din', 21525, '4 Ismael Al-Fangary', 'Alexandria', 'Male', to_date('09-03-2001'), 'Hemophilia')
+insert into patient values (111112, 'Yousef', 'Ahmed', 21928, '9 Al-Hadid w Al-Solb', 'Alexandria', 'Male', to_date('11-7-1973'), 'gallbladder')
+insert into patient values (111126, 'Alaa', 'Essam', 21678, '16 Ahmed Al-Sayed', 'Alexandria', 'Female', to_date('02-01-1999'), 'Colon Cancer')
+insert into patient values (111127, 'Omar', 'Mohamed', 21648, '2 AL-Mahmoudia Str', 'Alexandria', 'Male', to_date('08-08-1978'), 'Kidney disease')
+insert into patient values (111128, 'Sara', 'Ahmed', 21619, '2 AL-Nasr Street', 'Alexandria', 'Female', to_date('02-22-1995'), 'Pregnancy')
+insert into patient values (111129, 'Mohmoud', 'Mohamed', 21648, '9 Fawzy Moaz', 'Alexandria', 'Male', to_date('11-05-1992'), 'Hemophilia')
+insert into patient values (111130, 'Ahmed', 'Fathy', 21648, '32 Fawzy Moaz', 'Alexandria', 'Male', to_date('3-29-1996'), 'Hemophilia')
+-------------------------------------------------------------------------------
+Doctors |
+---------
+insert into Employee values (222221, 'Yasser', 'Foaad', 01296129362, 21743, 'Alexandria', '55 Roshdy Abaza', 'Male', 15000)
+insert into Employee values (222222, 'Mohamed', 'Waleed', 01169696969, 21456, 'Alexandria', '7 Eskandar Ibrahim', 'Male', 17000)
+insert into Employee values (222223, 'Yousry', 'Shawky', 01286996314, 21223, 'Alexandria', '67 Mohamed Rahim', 'Male', 13000)
+insert into Employee values (222224, 'Abd-Al Latif', 'Mohamed', 01009424152, 21525, 'Alexandria', '88 Kaaed Ibrahim', 'Male', 20000)
+insert into Employee values (222225, 'Hoda', 'Hassab', 01038211923, 21619, 'Alexandria', '43 Share3 20', 'Female', 10000)
+insert into Employee values (222226, 'Amira', 'Fathy', 01564793456, 21648, 'Alexandria', '5 Abo-Quir', 'Female', 16000)
+insert into Employee values (222227, 'Ziad', 'Tharwat', 0106969696, 21648, 'Alexandria', '7 Fawzy Moaz', 'Male', 12500)
+insert into Employee values (222228, 'Hayam', 'El-Sayed', 012965893248, 21213, 'Alexandria', '55 Roshdy Abaza', 'Male', 13000)
+insert into Employee values (222229, 'Tarek', 'Abd-ElRaze2', 010733630962, 21778, 'Alexandria', '55 Roshdy Abaza', 'Male', 11000)
+insert into Employee values (222230, 'Ziad', 'Shamandy', 01299192292, 21743, 'Alexandria', '55 Roshdy Abaza', 'Male', 12500)
+insert into Employee values (222231, 'Fares', 'Ayman', 01582361232, 21223, 'Alexandria', '2 Hassan Mahmoud', 'Male', 10000)
+insert into Employee values (222232, 'Foaad', 'Ahmed', 01221561292, 21341, 'Alexandria', '66 Abo Ryad', 'Male', 15000)
+insert into Employee values (222233, 'Omar', 'Atef', 01526262292, 21983, 'Alexandria', '9 Karam Al-Sham', 'Male', 12500)
+insert into Employee values (222234, 'Mina', 'Micheal', 01012342292, 21961, 'Alexandria', '18 Metro Pool', 'Male', 13000)
+insert into Employee values (222235, 'Yostina', 'Magdy', 01291823612, 21321, 'Alexandria', '24 Mickey-Mouse', 'Female', 8000)
+-------
+Nurse |
+-------
+insert into Employee values (333331, 'Soaad', 'Al-Sayed', 01292081932, 21743, 'Alexandria', '2 Fathy Foaad', 'Female', 3000)
+insert into Employee values (333332, 'Fawzya', 'Ibrahim', 01089123722, 21233, 'Alexandria', '2 Al-Shahid Younis', 'Female', 3000)
+insert into Employee values (333333, 'Hoda', 'Salem', 01081323522, 21268, 'Alexandria', '16 Al-Moshir', 'Female', 3000)
+insert into Employee values (333334, 'Hoda', 'Al-Sayed', 01523251932, 21743, 'Alexandria', '18 Fathy Foaad', 'Female', 3000)
+insert into Employee values (333335, 'Esraa', 'Shehata', 01527593648, 21523, 'Alexandria', '2 Foaad street', 'Female', 3000)
+insert into Employee values (333336, 'Salma', 'Yoursy', 0103256932, 21525, 'Alexandria', '211 Tiba street', 'Female', 3000)
+insert into Employee values (333337, 'Hayam', 'Ahmed', 01002552932, 21525, 'Alexandria', '3 Ismael Al-Fangary', 'Female', 3000)
+insert into Employee values (333338, 'Somaya', 'Shaaban', 01121132567, 21653, 'Alexandria', '4 Mostafa Kamel', 'Female', 3000)
+insert into Employee values (333339, 'Fatima', 'Al-Khashab', 01121132567, 21526, 'Alexandria', '3 Ahmed Shaaban', 'Female', 3000)
+insert into Employee values (333340, 'Mahitab', 'Mahmoud', 01223256869, 21223, 'Alexandria', '15 Mohamed Rahim', 'Female', 3000)
+--------------
+Receptionist |
+--------------
+insert into Employee values (444441, 'Rahma', 'Fathy', 01012132567, 21652, 'Alexandria', '2 Bor Saaid', 'Female', 5000)
+insert into Employee values (444442, 'Fatma', 'Fawzy', 01012132567, 21661, 'Alexandria', '12 Al-Mahmoudia', 'Female', 5000)
+insert into Employee values (444443, 'Fares', 'Soliman', 01526758877, 21432, 'Alexandria', '24 Maged Ismael', 'Male', 5000)
+-------------------------------------------------------------------------------
+insert into Department values ('Gastroenterists')
+insert into Department values ('Nephrologists')
+insert into Department values ('Dermatologists')
+insert into Department values ('Ophthal-gists')
+insert into Department values ('Psychiatrists')
+insert into Department values ('Otolar-gists')
+insert into Department values ('Surgeons')
+insert into Department values ('Hematologists')
+insert into Department values ('Cardiologists')
+insert into Department values ('Endocri-gists')
+-------------------------------------------------------------------------------
+insert into Room values (101, 'Blood diseases', 'Available')
+insert into Room values (102, 'Blood diseases', 'Available')
+insert into Room values (103, 'Blood diseases', 'Available')
+insert into Room values (104, 'Blood diseases', 'Available')
+insert into Room values (201, 'Pectoral', 'Available')
+insert into Room values (202, 'Pectoral', 'Available')
+insert into Room values (301, 'Internally', 'Available')
+insert into Room values (302, 'Internally', 'Available')
+insert into Room values (303, 'Internally', 'Available')
+insert into Room values (304, 'Internally', 'Available')
+insert into Room values (305, 'Internally', 'Available')
+insert into Room values (306, 'Internally', 'Available')
+-------------------------------------------------------------------------------
+insert into Medicine values (125101, 'Factor VIII')
+insert into Medicine values (125102, 'Factor IX')
+insert into Medicine values (125103, 'Ambezim')
+insert into Medicine values (125104, 'Paramol')
+insert into Medicine values (125105, 'Paracetamol')
+insert into Medicine values (125106, 'Aspirin')
+insert into Medicine values (125107, 'Doxycin')
+insert into Medicine values (125108, 'Regulon')
+insert into Medicine values (125109, 'Iragazan') 
+insert into Medicine values (125110, 'Hypericum')
+insert into Medicine values (125111, 'Aplenzin')
+insert into Medicine values (125112, 'Lustral')
+insert into Medicine values (125113, 'Aventyl capsules')
+insert into Medicine values (125114, 'Angilat')
+insert into Medicine values (125115, 'Cardiopril')
+insert into Medicine values (125116, 'Penicillin-G SOD') 
+insert into Medicine values (125117, 'ORVEK SYP')
+insert into Medicine values (125118, 'Retarpen')
+insert into Medicine values (125119, 'Fortepen') 
+insert into Medicine values (125120, 'Artamin')
+insert into Medicine values (125121, 'Resochin')
+insert into Medicine values (125122, 'Apicort') anemia
+insert into Medicine values (125123, 'Corrective lenses') 
+insert into Medicine values (125124, 'Maxitrol eye oint')
+insert into Medicine values (125125, 'Neomycin nasal spray') 
+insert into Medicine values (125126, 'Azithromycin')
+insert into Medicine values (125127, 'Clarithromycin')
+insert into Medicine values (125128, 'Doxycycline') 
+insert into Medicine values (125129, 'Chemotherapy')
+insert into Medicine values (125130, 'Radiotherapy')
+insert into Medicine values (125131, 'Surgeotherapy') 
+insert into Medicine values (125132, 'Tramdol')
+insert into Medicine values (125133, 'Gabapentin')
+insert into Medicine values (125134, 'Norco')
+insert into Medicine values (125135, 'Panadol')
+insert into Medicine values (125136, 'Panadol -Extra')
+insert into Medicine values (125137, 'Ibuprofen')
+-------------------------------------------------------------------------------
+insert into Laboratory values (115)
+insert into Laboratory values (116)
+insert into Laboratory values (117)
+insert into Laboratory values (118)
+insert into Laboratory values (223)
+insert into Laboratory values (224)
+insert into Laboratory values (225)
+insert into Laboratory values (226)
+insert into Laboratory values (227)
+insert into Laboratory values (228)
+insert into Laboratory values (337)
+insert into Laboratory values (338)
+-------------------------------------------------------------------------------
+insert into Payment values (90001, 'Paid', 'Cash')
+insert into Payment values (90002, 'Paid', 'Cash')
+insert into Payment values (90003, 'UNPaid', 'Cash')
+insert into Payment values (90004, 'Paid', 'Cash')
+insert into Payment values (90005, 'Paid', 'Cash')
+insert into Payment values (90006, 'UNPaid', 'Cash')
+insert into Payment values (90007, 'Paid', 'Cash')
+insert into Payment values (90008, 'Paid', 'Cash')
+insert into Payment values (90009, 'UNPaid', 'Cash')
+insert into Payment values (90010, 'Paid', 'Cash')
+insert into Payment values (80001, 'Paid', 'Visa')
+insert into Payment values (80002, 'UNPaid', 'Visa')
+insert into Payment values (80003, 'Paid', 'Visa')
+insert into Payment values (80004, 'Paid', 'Visa')
+insert into Payment values (80005, 'UNPaid', 'Visa')
+insert into Payment values (80006, 'Paid', 'Visa')
+insert into Payment values (80007, 'Paid', 'Visa')
+insert into Payment values (80008, 'UNPaid', 'Visa')
+insert into Payment values (80009, 'Paid', 'Visa')
+insert into Payment values (80010, 'Paid', 'Visa')
+-------------------------------------------------------------------------------
+insert into Phone_Number values (01098756472, 111111)
+insert into Phone_Number values (01059347595, 111112)
+insert into Phone_Number values (01192343748, 111113)
+insert into Phone_Number values (01283478342, 111114)
+insert into Phone_Number values (01192340823, 111115)
+insert into Phone_Number values (01193847234, 111116)
+insert into Phone_Number values (01099463834, 111117)
+insert into Phone_Number values (01192378244, 111118)
+insert into Phone_Number values (01592735261, 111119)
+insert into Phone_Number values (01592378231, 111120)
+insert into Phone_Number values (01523728401, 111121)
+insert into Phone_Number values (01193752823, 111122)
+insert into Phone_Number values (01223874733, 111123)
+insert into Phone_Number values (01092377236, 111124)
+insert into Phone_Number values (01562368123, 111125)
+insert into Phone_Number values (01015957945, 111126)
+insert into Phone_Number values (01192376374, 111127)
+insert into Phone_Number values (01198754472, 111128)
+insert into Phone_Number values (01198798236, 111129)
+insert into Phone_Number values (01253846593, 111130)
+insert into Phone_Number values (01523757233, 111111)
+insert into Phone_Number values (01596271272, 111115)
+insert into Phone_Number values (01298923723, 111119)
+insert into Phone_Number values (01103773811, 111114)
+insert into Phone_Number values (01509375838, 111122)
+insert into Phone_Number values (01109302372, 111127)
+insert into Phone_Number values (01502395710, 111125)
+insert into Phone_Number values (01001032742, 111130)
+-------------------------------------------------------------------------------
+insert into Equipment values (42401, 'ASTTR', 'Germany', 'High-Tech', 88000, 115)
+insert into Equipment values (42402, 'ASTTR', 'Germany', 'High-Tech', 88000, 116)
+insert into Equipment values (42403, 'ASTTR', 'Germany', 'High-Tech', 88000, 117)
+insert into Equipment values (42404, 'X-Ray', 'Germany', 'High-Tech', 70000, 115)
+insert into Equipment values (42405, 'X-Ray', 'Germany', 'High-Tech', 70000, 118)
+insert into Equipment values (42406, 'CT Scan', 'Germany', 'High-Tech', 120000, 337)
+insert into Equipment values (42407, 'CT Scan', 'Germany', 'High-Tech', 120000, 338)
+insert into Equipment values (42408, 'CT Scan', 'Germany', 'High-Tech', 120000, 228)
+insert into Equipment values (42409, 'MSI', 'Korea', 'Tanshimo', 110000, 227)
+insert into Equipment values (42410, 'MSI', 'Korea', 'Tanshimo', 110000, 226)
+insert into Equipment values (42411, 'MSI', 'Korea', 'Tanshimo', 110000, 225)
+insert into Equipment values (42412, 'Infrared', 'Malaysia', 'Raymen', 20000, 223)
+insert into Equipment values (42413, 'Infrared', 'Malaysia', 'Raymen', 20000, 223)
+insert into Equipment values (42414, 'Infrared', 'Malaysia', 'Raymen', 20000, 223)
+insert into Equipment values (42415, 'Infrared', 'Malaysia', 'Raymen', 20000, 223)
+insert into Equipment values (42416, 'Infrared', 'Malaysia', 'Raymen', 20000, 223)
+insert into Equipment values (42417, 'Ultrasound', 'Thailand', 'Rayzen', 40000, 116)
+insert into Equipment values (42418, 'Ultrasound', 'Thailand', 'Rayzen', 40000, 117)
+insert into Equipment values (42419, 'Ultrasound', 'Thailand', 'Rayzen', 40000, 116)
+insert into Equipment values (42420, 'Ultrasound', 'Thailand', 'Rayzen', 40000, 117)
+insert into Equipment values (42421, 'DNA-RNA', 'Germany', 'High-Tech', 35000, 115)
+insert into Equipment values (42422, 'DNA-RNA', 'Germany', 'High-Tech', 35000, 116)
+insert into Equipment values (42423, 'Urinary', 'Germany', 'High-Tech', 35000, 117)
+insert into Equipment values (42424, 'Urinary', 'Germany', 'High-Tech', 35000, 118)
+insert into Equipment values (42425, 'Monitor', 'Egypt', 'Samsung', 11000, 115)
+insert into Equipment values (42426, 'Monitor', 'Egypt', 'Samsung', 11000, 116)
+insert into Equipment values (42427, 'Monitor', 'Egypt', 'Samsung', 11000, 117)
+insert into Equipment values (42428, 'Monitor', 'Egypt', 'Samsung', 11000, 118)
+insert into Equipment values (42429, 'Monitor', 'Egypt', 'Samsung', 11000, 223)
+insert into Equipment values (42430, 'Monitor', 'Egypt', 'Samsung', 11000, 224)
+insert into Equipment values (42431, 'Monitor', 'Egypt', 'Samsung', 11000, 225)
+insert into Equipment values (42432, 'Monitor', 'Egypt', 'Samsung', 11000, 226)
+insert into Equipment values (42433, 'Monitor', 'Egypt', 'Samsung', 11000, 227)
+insert into Equipment values (42434, 'Monitor', 'Egypt', 'Samsung', 11000, 228)
+insert into Equipment values (42435, 'Monitor', 'Egypt', 'Samsung', 11000, 337)
+insert into Equipment values (42436, 'Monitor', 'Egypt', 'Samsung', 11000, 338)
+-------------------------------------------------------------------------------
+insert into Nurse values (333331)
+insert into Nurse values (333332)
+insert into Nurse values (333333)
+insert into Nurse values (333334)
+insert into Nurse values (333335)
+insert into Nurse values (333336)
+insert into Nurse values (333337)
+insert into Nurse values (333338)
+insert into Nurse values (333339)
+insert into Nurse values (333340)
+------------------------------------------------------------------------------
+insert into Receptionist values (444441)
+insert into Receptionist values (444442)
+insert into Receptionist values (444443)
+------------------------------------------------------------------------------
+insert into Doctor values (222221, 115, 'Gastroenterists')
+insert into Doctor values (222222, 116, 'Nephrologists')
+insert into Doctor values (222223, 117, 'Dermatologists')
+insert into Doctor values (222224, 118, 'Ophthal-gists')
+insert into Doctor values (222225, 223, 'Cardiologists')
+insert into Doctor values (222226, 224, 'Otolar-gists')
+insert into Doctor (Doctor_ID, Department_Name) values (222227, 'Surgeons')
+insert into Doctor values (222228, 226, 'Hematologists')
+insert into Doctor values (222229, 227, 'Cardiologists')
+insert into Doctor values (222230, 228, 'Endocri-gists')
+insert into Doctor values (222231, 337, 'Gastroenterists')
+insert into Doctor values (222232, 337, 'Nephrologists')
+insert into Doctor values (222233, 115, 'Ophthal-gists')
+insert into Doctor values (222234, 227, 'Hematologists')
+insert into Doctor (Doctor_ID, Department_Name) values (222235, 'Psychiatrists')
+------------------------------------------------------------------------------
+insert into Outpatient values (111111, to_date('09-02-2021'))
+insert into Outpatient values (111114, to_date('03-12-2021'))
+insert into Outpatient values (111116, to_date('02-01-2021'))
+insert into Outpatient values (111117, to_date('05-11-2021'))
+insert into Outpatient values (111118, to_date('04-22-2021'))
+insert into Outpatient values (111119, to_date('12-03-2021'))
+insert into Outpatient values (111120, to_date('08-17-2021'))
+insert into Outpatient values (111121, to_date('11-22-2021'))
+insert into Outpatient values (111124, to_date('03-29-2021'))
+insert into Outpatient values (111125, to_date('07-30-2021'))
+-------------------------------------------------------------------------------
+insert into Inpatient values (111122, 301, to_date('03-29-2021'), to_date('04-05-2021'))
+insert into Inpatient values (111123, 302, to_date('04-01-2021'), to_date('04-06-2021'))
+insert into Inpatient values (111115, 201, to_date('02-04-2021'), to_date('04-08-2021'))
+insert into Inpatient values (111113, 101, to_date('07-07-2021'), to_date('07-12-2021'))
+insert into Inpatient values (111112, 303, to_date('05-09-2021'), to_date('05-12-2021'))
+insert into Inpatient values (111126, 304, to_date('06-13-2021'), to_date('06-15-2021'))
+insert into Inpatient values (111127, 305, to_date('07-16-2021'), to_date('07-19-2021'))
+insert into Inpatient values (111128, 306, to_date('03-18-2021'), to_date('03-22-2021'))
+insert into Inpatient values (111129, 102, to_date('12-18-2021'), to_date('12-25-2021'))
+insert into Inpatient values (111130, 103, to_date('11-25-2021'), to_date('11-27-2021'))
+-------------------------------------------------------------------------------
+insert into Bill (Bill_ID, patient_ID, payment_ID, Receptionist_ID, Doc_Charges) values (100101, 111111, 90001, 444441, 100)
+insert into Bill (Bill_ID, patient_ID, payment_ID, Receptionist_ID, Doc_Charges) values (100102, 111114, 90002, 444441, 70)
+insert into Bill (Bill_ID, patient_ID, payment_ID, Receptionist_ID, Doc_Charges) values (100103, 111116, 90004, 444441, 70)
+insert into Bill (Bill_ID, patient_ID, payment_ID, Receptionist_ID, Doc_Charges) values (100104, 111117, 90005, 444441, 50)
+insert into Bill (Bill_ID, patient_ID, payment_ID, Receptionist_ID, Doc_Charges) values (100105, 111118, 90007, 444441, 100)
+insert into Bill (Bill_ID, patient_ID, payment_ID, Receptionist_ID, Doc_Charges) values (100106, 111119, 90008, 444441, 100)
+insert into Bill (Bill_ID, patient_ID, payment_ID, Receptionist_ID, Doc_Charges) values (100107, 111120, 90010, 444442, 50)
+insert into Bill (Bill_ID, patient_ID, payment_ID, Receptionist_ID, Doc_Charges) values (100108, 111121, 80001, 444442, 25)
+insert into Bill (Bill_ID, patient_ID, payment_ID, Receptionist_ID, Doc_Charges) values (100109, 111124, 80003, 444442, 50)
+insert into Bill (Bill_ID, patient_ID, payment_ID, Receptionist_ID, Doc_Charges) values (100110, 111125, 80004, 444442, 100)
+insert into Bill values (100111, 111122, 90003, 444442, 100, 600)
+insert into Bill values (100112, 111123, 90006, 444442, 100, 800)
+insert into Bill values (100113, 111115, 80006, 444441, 100, 1000)
+insert into Bill values (100114, 111113, 80005, 444441, 200, 400)
+insert into Bill values (100115, 111112, 80007, 444441, 150, 500)
+insert into Bill values (100116, 111126, 90009, 444443, 100, 600)
+insert into Bill values (100117, 111127, 80002, 444443, 125, 600)
+insert into Bill values (100118, 111128, 80008, 444443, 100, 800)
+insert into Bill values (100119, 111129, 80009, 444443, 150, 800)
+insert into Bill values (100120, 111130, 80010, 444443, 100, 1000)
+-------------------------------------------------------------------------------
+insert into Analysis values (200201, 115, 111111, to_date('09-02-2021'))
+insert into Analysis values (200202, 115, 111122, to_date('03-29-2021'))
+insert into Analysis values (200203, 115, 111115, to_date('02-04-2021'))
+insert into Analysis values (200204, 115, 111127, to_date('07-16-2021'))
+insert into Analysis values (200205, 115, 111130, to_date('11-25-2021'))
+-------------------------------------------------------------------------------
+insert into Description values (100501, 125124, 222221, 111123, 50)
+insert into Description values (100502, 125107, 222223, 111111, 1)
+insert into Description values (100503, 125105, 222221, 111114, 25)
+insert into Description values (100504, 125105, 222231, 111116, 25)
+insert into Description values (100505, 125110, 222235, 111117, 50)
+insert into Description values (100506, 125107, 222223, 111118, 1) 
+insert into Description values (100507, 125105, 222221, 111119, 25)
+insert into Description values (100508, 125114, 222228, 111120, 60)
+insert into Description values (100509, 125134, 222225, 111121, 100) 
+insert into Description values (100510, 125118, 222222, 111124, 50) 
+insert into Description values (100511, 125120, 222234, 111125, 35)
+insert into Description values (100512, 125123, 222224, 111122, 5.6)
+insert into Description values (100513, 125126, 222226, 111115, 50) 
+insert into Description values (100514, 125101, 222228, 111113, 1500)
+insert into Description values (100515, 125125, 222222, 111112, 300)
+insert into Description values (100516, 125131, 222232, 111126, 1) 
+insert into Description values (100517, 125124, 222221, 111127, 100)
+insert into Description values (100518, 125133, 222227, 111128, 75)
+insert into Description values (100519, 125102, 222228, 111129, 1000)
+insert into Description values (100520, 125103, 222228, 111130, 200)
+-------------------------------------------------------------------------------
+insert into Examination values (111111, 222223, to_date('09-02-2021'))
+insert into Examination values (111114, 222221, to_date('03-12-2021'))
+insert into Examination values (111116, 222231, to_date('02-01-2021'))
+insert into Examination values (111117, 222235, to_date('05-11-2021'))
+insert into Examination values (111118, 222223, to_date('04-22-2021'))
+insert into Examination values (111119, 222221, to_date('12-03-2021'))
+insert into Examination values (111120, 222228, to_date('08-17-2021'))
+insert into Examination values (111121, 222225, to_date('11-22-2021'))
+insert into Examination values (111124, 222222, to_date('03-29-2021'))
+insert into Examination values (111125, 222234, to_date('07-30-2021'))
+insert into Examination values (111122, 222224, to_date('03-29-2021'))
+insert into Examination values (111123, 222221, to_date('04-01-2021'))
+insert into Examination values (111115, 222226, to_date('02-04-2021'))
+insert into Examination values (111113, 222228, to_date('07-07-2021'))
+insert into Examination values (111112, 222222, to_date('05-09-2021'))
+insert into Examination values (111126, 222232, to_date('06-13-2021'))
+insert into Examination values (111127, 222221, to_date('07-16-2021'))
+insert into Examination values (111128, 222227, to_date('03-18-2021'))
+insert into Examination values (111129, 222228, to_date('12-18-2021'))
+insert into Examination values (111130, 222228, to_date('11-25-2021'))
+-------------------------------------------------------------------------------
+insert into Helping values (222221, 333331)
+insert into Helping values (222221, 333332)
+insert into Helping values (222221, 333333)
+insert into Helping values (222222, 333334)
+insert into Helping values (222222, 333335)
+insert into Helping values (222222, 333336)
+insert into Helping values (222223, 333337)
+insert into Helping values (222223, 333338)
+insert into Helping values (222223, 333339)
+insert into Helping values (222224, 333340)
+insert into Helping values (222224, 333331)
+insert into Helping values (222224, 333332)
+insert into Helping values (222225, 333333)
+insert into Helping values (222225, 333334)
+insert into Helping values (222225, 333335)
+insert into Helping values (222226, 333336)
+insert into Helping values (222226, 333337)
+insert into Helping values (222226, 333338)
+insert into Helping values (222227, 333339)
+insert into Helping values (222227, 333340)
+insert into Helping values (222227, 333331)
+insert into Helping values (222228, 333332)
+insert into Helping values (222228, 333333)
+insert into Helping values (222228, 333334)
+insert into Helping values (222229, 333335)
+insert into Helping values (222229, 333336)
+insert into Helping values (222229, 333337)
+insert into Helping values (222230, 333338)
+insert into Helping values (222230, 333339)
+insert into Helping values (222230, 333330)
+insert into Helping values (222231, 333331)
+insert into Helping values (222231, 333332)
+insert into Helping values (222231, 333333)
+insert into Helping values (222232, 333334)
+insert into Helping values (222232, 333335)
+insert into Helping values (222232, 333336)
+insert into Helping values (222233, 333337)
+insert into Helping values (222233, 333338)
+insert into Helping values (222233, 333339)
+insert into Helping values (222234, 333340)
+insert into Helping values (222234, 333331)
+insert into Helping values (222234, 333332)
+insert into Helping values (222235, 333333)
+insert into Helping values (222235, 333334)
+insert into Helping values (222235, 333335)
+-------------------------------------------------------------------------------
+insert into Governs values (333331, 101)
+insert into Governs values (333332, 101)
+insert into Governs values (333333, 102)
+insert into Governs values (333334, 102)
+insert into Governs values (333335, 103)
+insert into Governs values (333336, 103)
+insert into Governs values (333337, 104)
+insert into Governs values (333338, 104)
+insert into Governs values (333339, 201)
+insert into Governs values (333340, 201)
+insert into Governs values (333331, 202)
+insert into Governs values (333332, 202)
+insert into Governs values (333333, 301)
+insert into Governs values (333334, 301)
+insert into Governs values (333335, 302)
+insert into Governs values (333336, 302)
+insert into Governs values (333337, 303)
+insert into Governs values (333338, 303)
+insert into Governs values (333339, 304)
+insert into Governs values (333340, 304)
+insert into Governs values (333331, 305)
+insert into Governs values (333332, 305)
+insert into Governs values (333333, 306)
+insert into Governs values (333334, 306)
+-------------------------------------------------------------------------------
+That's All ... Thanks you :)
